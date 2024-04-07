@@ -41,41 +41,17 @@ struct DayPicker<Label: View>: View {
         self.label = { DefaultFixedDayTitle(month: $0) }
     }
     
-    private var weeksForCurrentMonth: Array<[Fixed<Day>]> {
-        var allDays = Array(currentMonth.days)
-        
-        // pad out the front of the array with any additional days
-        while allDays[0].dayOfWeek != currentMonth.calendar.firstWeekday {
-            allDays.insert(allDays[0].previous, at: 0)
-        }
+    private var weeksForCurrentMonth: Array<Fixed<Week>> {
+        var weeks = Array(currentMonth.weeks)
         
         if consistentNumberOfWeeks {
             // Apple Calendar shows 6 weeks at a time, so all views have the same vertical height
             // this eliminates complexity around dynamically resizing the month view
-            while allDays.count < 42 {
-                allDays.append(allDays.last!.next)
+            while weeks.count < 6 {
+                weeks.append(weeks.last!.next)
             }
-        } else {
-            repeat {
-                let proposedNextDay = allDays.last!.next
-                if proposedNextDay.dayOfWeek != currentMonth.calendar.firstWeekday {
-                    allDays.append(proposedNextDay)
-                } else {
-                    break
-                }
-            } while true
         }
-        
-        // all supported calendars have weeks of seven days
-        assert(allDays.count.isMultiple(of: 7))
-        
-        // slice the array into groups of seven
-        let numberOfWeeks = allDays.count / 7
-        
-        return (0 ..< numberOfWeeks).map { weekNumber in
-            let dayRange = (weekNumber * 7) ..< ((weekNumber + 1) * 7)
-            return Array(allDays[dayRange])
-        }
+        return weeks
     }
     
     var body: some View {
@@ -108,7 +84,7 @@ struct DayPicker<Label: View>: View {
             
             Grid(alignment: .centerFirstTextBaseline, horizontalSpacing: 2, verticalSpacing: 2) {
                 GridRow {
-                    ForEach(weeks[0], id: \.self) { day in
+                    ForEach(Array(weeks[0].days), id: \.self) { day in
                         Text(day.format(weekday: .abbreviatedName))
                             .fixedSize() // prevent the text from wrapping
                     }
@@ -120,7 +96,7 @@ struct DayPicker<Label: View>: View {
                 
                 ForEach(weeks, id: \.self) { week in
                     GridRow {
-                        ForEach(week, id: \.self) { day in
+                        ForEach(Array(week.days), id: \.self) { day in
                             toggle(for: day)
                         }
                     }

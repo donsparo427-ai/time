@@ -105,7 +105,9 @@ extension Fixed where Granularity: StandardUnit & GTOEMonth & LTOEYear {
     public var weeks: FixedSequence<Week> {
         return FixedSequence(start: self.firstWeek,
                              stride: .weeks(1),
-                             while: { $0.lastDay.truncated() == self })
+                             while: { week in
+            week.days.contains(where: { $0.truncated() == self })
+        })
     }
     
 }

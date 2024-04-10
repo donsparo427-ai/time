@@ -4,7 +4,7 @@ An overview of **Time**'s basic features and common use-cases.
 
 ### Getting the current time
 
-The current time is retrieved via the ``Clocks/system``, which provides the time based on the user's device and preferences:
+The current time is retrieved via the ``Clocks/system`` clock, which provides the time based on the user's device and preferences:
 
 ```swift
 let systemClock = Clocks.system

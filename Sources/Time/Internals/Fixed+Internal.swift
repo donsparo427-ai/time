@@ -165,7 +165,7 @@ extension Fixed {
          - github issue #70 tracks improving the performance of this method
          */
         
-        let represented = match.dateComponents.representedComponents
+        let represented = match.dateComponents.representedStandardComponents
         guard let smallest = Calendar.Component.ascendingOrder.first(where: { represented.contains($0) }) else {
             // throw?
             return self

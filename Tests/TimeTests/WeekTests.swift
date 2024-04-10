@@ -125,10 +125,16 @@ class WeekTests: XCTestCase {
     func testWeeksOfYear() throws {
         let y1 = try Fixed<Year>(region: .posix, year: 2024)
         let yearWeeks = Array(y1.weeks)
-        XCTAssertEqual(yearWeeks.count, 52)
+        XCTAssertEqual(yearWeeks.count, 53)
         
-        let w1 = yearWeeks[0]
-        XCTAssertTime(w1.firstDay, era: 1, year: 2023, month: 12, day: 31)
+        let w0 = yearWeeks[0]
+        XCTAssertTime(w0.firstDay, era: 1, year: 2023, month: 12, day: 31)
+        
+        let w25 = yearWeeks[25]
+        XCTAssertTime(w25.firstDay, era: 1, year: 2024, month: 6, day: 23)
+        
+        let w52 = yearWeeks[52]
+        XCTAssertTime(w52.firstDay, era: 1, year: 2024, month: 12, day: 29)
     }
     
     func testWeekRounding() throws {

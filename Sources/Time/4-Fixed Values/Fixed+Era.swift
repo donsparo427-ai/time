@@ -3,6 +3,9 @@ import Foundation
 extension Fixed where Granularity == Era {
     
     /// Retrieve the first year of this era
+    ///
+    /// - Warning: Many calendars do not support accurate computations around eras. Depending on the
+    /// `.calendar`, this value will likely be wrong. 
     public var firstYear: Fixed<Year> { return first() }
     
     /// Retrieve the last year of this era

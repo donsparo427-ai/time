@@ -13,10 +13,10 @@ import Foundation
 /// The base protocol for defining calendrical units
 ///
 /// - Warning: You may not implement this protocol.
+#if swift(>=5.8)
+@_documentation(visibility: internal)
+#endif
 public protocol Unit {
-    #if swift(>=5.8)
-    @_documentation(visibility: internal)
-    #endif
     static var _closer: ProtocolCloser<Self> { get }
     static var component: Calendar.Component { get }
     static var requiredComponent: Calendar.Component { get }
@@ -26,8 +26,14 @@ extension Unit {
     public static var requiredComponent: Calendar.Component { self.component }
 }
 
+#if swift(>=5.8)
+@_documentation(visibility: internal)
+#endif
 public protocol StandardUnit: Unit { }
 
+#if swift(>=5.8)
+@_documentation(visibility: internal)
+#endif
 public protocol PseudoUnit: Unit { }
 
 /// The representation of nanoseconds to the Swift type system

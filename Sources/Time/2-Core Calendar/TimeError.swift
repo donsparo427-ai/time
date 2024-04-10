@@ -86,7 +86,7 @@ extension TimeError {
                                                description: String? = nil) -> TimeError {
         
         return .init(reason: .invalidComponents,
-                     units: units ?? components.representedComponents,
+                     units: units ?? components.representedStandardComponents,
                      dateComponents: components,
                      region: region,
                      formatString: nil,

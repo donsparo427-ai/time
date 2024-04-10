@@ -81,12 +81,17 @@ internal extension DateComponents {
         return val != nil && val != FoundationNotFound
     }
     
-    var representedComponents: Set<Calendar.Component> {
+    var representedNumericComponents: Set<Calendar.Component> {
+        let contained = Calendar.Component.numericComponents.filter { self.has(component: $0) }
+        return Set(contained)
+    }
+    
+    var representedStandardComponents: Set<Calendar.Component> {
         let contained = Calendar.Component.ascendingOrder.filter { self.has(component: $0) }
         return Set(contained)
     }
     
-    var smallestRepresentedComponent: Calendar.Component? {
+    var smallestRepresentedStandardComponent: Calendar.Component? {
         return Calendar.Component.ascendingOrder.first(where: { self.has(component: $0) })
     }
     

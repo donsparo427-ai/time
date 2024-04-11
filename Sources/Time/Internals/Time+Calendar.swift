@@ -1,6 +1,7 @@
 import Foundation
 
 extension Calendar {
+    static let eraRelevance = SimpleCache<Calendar.Identifier, Bool>()
     
     /// Different calendars may have different definitions of what a "second" is.
     /// For example, on Earth, calendars all have the convention that one calendar-second
@@ -18,7 +19,11 @@ extension Calendar {
     /// (most notably the Japanese calendar) for which the era is extremely relevant.
     /// The relevancy of the era is taken into account when doing default formatting
     /// of calendar Values.
-    internal var isEraRelevant: Bool { return (maximumRange(of: .era)?.upperBound ?? 0) > 2 }
+    internal var isEraRelevant: Bool {
+        Self.eraRelevance.get(identifier, create: {
+            (maximumRange(of: .era)?.upperBound ?? 0) > 2
+        })
+    }
     
     internal var lenientUnitsForFixedTimePeriods: Set<Calendar.Component> {
         if isEraRelevant { return [] }

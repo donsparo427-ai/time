@@ -24,6 +24,9 @@ extension Fixed where Granularity == Year {
     /// - Throws: A ``TimeError`` if the specified components cannot be converted into a calendar value.
     public init(region: Region, era: Int? = nil, year: Int) throws {
         let components = DateComponents(era: era, year: year)
+        if components.has(component: .era) == false && region.calendar.isEraRelevant {
+            throw TimeError.invalidDateComponents(components, units: [.era], in: region)
+        }
         try self.init(region: region, strictDateComponents: components)
     }
     
@@ -136,6 +139,91 @@ extension Fixed where Granularity == Nanosecond {
     public init(region: Region, era: Int? = nil, year: Int, month: Int, day: Int, hour: Int, minute: Int, second: Int, nanosecond: Int) throws {
         let components = DateComponents(era: era, year: year, month: month, day: day, hour: hour, minute: minute, second: second, nanosecond: nanosecond)
         try self.init(region: region, strictDateComponents: components)
+    }
+    
+}
+
+extension Fixed where Granularity == Week {
+    
+    public init(region: Region, era: Int? = nil, year: Int, week: Int) throws {
+        let sourceComponents = DateComponents(era: era, year: year, weekOfYear: week)
+        if era == nil && region.calendar.isEraRelevant {
+            throw TimeError.invalidDateComponents(sourceComponents, in: region)
+        }
+        
+        let date: Date
+        if week > 1 {
+            var localComponents = sourceComponents
+            localComponents.weekOfYear = 1
+            guard let firstWeekOfYear = region.calendar.date(from: localComponents) else {
+                throw TimeError.invalidDateComponents(sourceComponents, in: region)
+            }
+            guard let nthWeekOfYear = region.calendar.date(byAdding: .weekOfYear, value: week - 1, to: firstWeekOfYear) else {
+                throw TimeError.invalidDateComponents(sourceComponents, in: region)
+            }
+            date = nthWeekOfYear
+        } else {
+            guard let firstWeekOfYear = region.calendar.date(from: sourceComponents) else {
+                throw TimeError.invalidDateComponents(sourceComponents, in: region)
+            }
+            date = firstWeekOfYear
+        }
+        
+        let weekComponents = region.calendar.dateComponents(in: region.timeZone, from: date)
+        if region.calendar.isEraRelevant && sourceComponents.era != weekComponents.era {
+            throw TimeError.invalidDateComponents(sourceComponents, in: region)
+        }
+        if sourceComponents.year != weekComponents.year {
+            throw TimeError.invalidDateComponents(sourceComponents, in: region)
+        }
+        if sourceComponents.weekOfYear != weekComponents.weekOfYear {
+            throw TimeError.invalidDateComponents(sourceComponents, in: region)
+        }
+        
+        let actualComponents = weekComponents.restrict(to: Self.representedComponents)
+        self.init(region: region, instant: Instant(date: date), components: actualComponents)
+    }
+    
+    public init(region: Region, era: Int? = nil, year: Int, month: Int, week: Int) throws {
+        let sourceComponents = DateComponents(era: era, year: year, month: month, weekOfMonth: week)
+        if era == nil && region.calendar.isEraRelevant {
+            throw TimeError.invalidDateComponents(sourceComponents, in: region)
+        }
+        
+        let date: Date
+        if week > 1 {
+            var localComponents = sourceComponents
+            localComponents.weekOfYear = 1
+            guard let firstWeekOfMonth = region.calendar.date(from: localComponents) else {
+                throw TimeError.invalidDateComponents(sourceComponents, in: region)
+            }
+            guard let nthWeekOfMonth = region.calendar.date(byAdding: .weekOfMonth, value: week - 1, to: firstWeekOfMonth) else {
+                throw TimeError.invalidDateComponents(sourceComponents, in: region)
+            }
+            date = nthWeekOfMonth
+        } else {
+            guard let firstWeekOfMonth = region.calendar.date(from: sourceComponents) else {
+                throw TimeError.invalidDateComponents(sourceComponents, in: region)
+            }
+            date = firstWeekOfMonth
+        }
+        
+        let weekComponents = region.calendar.dateComponents(in: region.timeZone, from: date)
+        if region.calendar.isEraRelevant && sourceComponents.era != weekComponents.era {
+            throw TimeError.invalidDateComponents(sourceComponents, in: region)
+        }
+        if sourceComponents.year != weekComponents.year {
+            throw TimeError.invalidDateComponents(sourceComponents, in: region)
+        }
+        if sourceComponents.month != weekComponents.month {
+            throw TimeError.invalidDateComponents(sourceComponents, in: region)
+        }
+        if sourceComponents.weekOfMonth != weekComponents.weekOfMonth {
+            throw TimeError.invalidDateComponents(sourceComponents, in: region)
+        }
+        
+        let actualComponents = weekComponents.restrict(to: Self.representedComponents)
+        self.init(region: region, instant: Instant(date: date), components: actualComponents)
     }
     
 }

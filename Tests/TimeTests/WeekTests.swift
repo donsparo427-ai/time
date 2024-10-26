@@ -97,34 +97,26 @@ class WeekTests: XCTestCase {
     
     func testWeeksOfMonth() throws {
         let m1 = try Fixed<Month>(region: .posix, year: 2024, month: 1)
-        XCTAssertThrowsError(try m1.nthWeek(0))
+        XCTAssertThrowsError(try m1.nthFullWeek(0))
         
-        let w1 = try m1.nthWeek(1)
-        XCTAssertTime(w1.firstDay, era: 1, year: 2023, month: 12, day: 31)
-        XCTAssertTime(w1.lastDay, era: 1, year: 2024, month: 1, day: 6)
-        
-        let w2 = try m1.nthWeek(2)
+        let w2 = try m1.nthFullWeek(1)
         XCTAssertTime(w2.firstDay, era: 1, year: 2024, month: 1, day: 7)
         XCTAssertTime(w2.lastDay, era: 1, year: 2024, month: 1, day: 13)
         
-        let w3 = try m1.nthWeek(3)
+        let w3 = try m1.nthFullWeek(2)
         XCTAssertTime(w3.firstDay, era: 1, year: 2024, month: 1, day: 14)
         XCTAssertTime(w3.lastDay, era: 1, year: 2024, month: 1, day: 20)
         
-        let w4 = try m1.nthWeek(4)
+        let w4 = try m1.nthFullWeek(3)
         XCTAssertTime(w4.firstDay, era: 1, year: 2024, month: 1, day: 21)
         XCTAssertTime(w4.lastDay, era: 1, year: 2024, month: 1, day: 27)
         
-        let w5 = try m1.nthWeek(5)
-        XCTAssertTime(w5.firstDay, era: 1, year: 2024, month: 1, day: 28)
-        XCTAssertTime(w5.lastDay, era: 1, year: 2024, month: 2, day: 3)
-        
-        XCTAssertThrowsError(try m1.nthWeek(6))
+        XCTAssertThrowsError(try m1.nthFullWeek(4))
     }
     
     func testWeeksOfYear() throws {
         let y1 = try Fixed<Year>(region: .posix, year: 2024)
-        let yearWeeks = Array(y1.weeks)
+        let yearWeeks = Array(y1.overlappingWeeks)
         XCTAssertEqual(yearWeeks.count, 53)
         
         let w0 = yearWeeks[0]
@@ -165,13 +157,13 @@ class WeekTests: XCTestCase {
         let m2 = try Fixed<Month>(region: .posix, year: 2024, month: 9)
         let ffw2 = try XCTUnwrap(m2.firstFullWeek)
         XCTAssertTime(ffw2.firstDay, era: 1, year: 2024, month: 9, day: 1)
-        XCTAssertEqual(m2.firstWeek, ffw2)
+        XCTAssertEqual(m2.firstOverlappingWeek, ffw2)
         
         // november 2024's last full week should also be its last week
         let m3 = m2.adding(months: 2)
         let lfw3 = try XCTUnwrap(m3.lastFullWeek)
         XCTAssertTime(lfw3.firstDay, era: 1, year: 2024, month: 11, day: 24)
-        XCTAssertEqual(m3.lastWeek, lfw3)
+        XCTAssertEqual(m3.lastOverlappingWeek, lfw3)
         
         // The coptic calendar has an intercalary month of 5 or 6 days
         // that means it's never long enough to contain an entire full week
@@ -179,10 +171,10 @@ class WeekTests: XCTestCase {
         // but the month itself has no full weeks
         let copticRegion = Region.posix.setCalendar(Calendar(identifier: .coptic))
         let piKogiEnavot = try Fixed<Month>(region: copticRegion, year: 1740, month: 13)
-        let w1 = piKogiEnavot.firstWeek
+        let w1 = piKogiEnavot.firstOverlappingWeek
         XCTAssertEqual(piKogiEnavot.relation(to: w1), .isOverlappedBy)
         
-        let w2 = piKogiEnavot.lastWeek
+        let w2 = piKogiEnavot.lastOverlappingWeek
         XCTAssertEqual(piKogiEnavot.relation(to: w2), .overlaps)
         
         XCTAssertNil(piKogiEnavot.firstFullWeek)

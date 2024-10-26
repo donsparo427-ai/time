@@ -18,7 +18,14 @@ import Foundation
 #endif
 public protocol Unit {
     static var _closer: ProtocolCloser<Self> { get }
+    
+    /// The `Calendar.Component` that this unit represents
     static var component: Calendar.Component { get }
+    
+    /// The smallest `Calendar.Component` that must be present in order for this unit
+    /// to be considered valid.
+    ///
+    /// For most units, the ``requiredComponent`` is equivalent to its ``component``.
     static var requiredComponent: Calendar.Component { get }
 }
 

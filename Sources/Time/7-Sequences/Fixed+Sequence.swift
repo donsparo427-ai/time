@@ -5,6 +5,10 @@ public struct FixedSequence<U: Unit & LTOEEra>: Sequence {
     
     private let constructor: () -> FixedIterator<U>
     
+    internal init() {
+        constructor = { FixedIterator() }
+    }
+    
     /// Construct an infinite sequence of fixed values starting from a specific value.
     /// - Parameters:
     ///   - start: The starting fixed value.
@@ -58,13 +62,11 @@ public struct FixedSequence<U: Unit & LTOEEra>: Sequence {
 
 /// An iterator of fixed values.
 public struct FixedIterator<U: Unit & LTOEEra>: IteratorProtocol {
-    private let region: Region
+    private var algorithm: any IterationAlgorithm<U>
     
-    private let keepGoing: (Fixed<U>) -> Bool
-    private let start: Fixed<U>
-    
-    private var scale = 0
-    private let stride: DateComponents
+    internal init() {
+        self.algorithm = EmptyAlgorithm()
+    }
     
     /// Construct an iterator of fixed values starting from a specific value.
     /// - Parameters:
@@ -72,10 +74,10 @@ public struct FixedIterator<U: Unit & LTOEEra>: IteratorProtocol {
     ///   - stride: The difference between subsequent fixed values.
     ///   - keepGoing: A closure that is invoked to indicate whether the sequence should continue. This closure is invoked *before* the next value is generated.
     public init(start: Fixed<U>, stride: TimeDifference<U, Era>, keepGoing: @escaping (Fixed<U>) -> Bool) {
-        self.region = start.region
-        self.start = start
-        self.stride = stride.dateComponents
-        self.keepGoing = keepGoing
+        self.algorithm = StridingAlgorithm(region: start.region,
+                                           keepGoing: keepGoing,
+                                           start: start,
+                                           stride: stride.dateComponents)
     }
     
     /// Construct an iterator of fixed values that are within a specific range
@@ -84,13 +86,15 @@ public struct FixedIterator<U: Unit & LTOEEra>: IteratorProtocol {
     ///   - range: The ``Instant`` range through which to iterate
     ///   - stride: The difference between subsequent fixed values
     public init(region: Region, range: Range<Instant>, stride: TimeDifference<U, Era>) {
-        self.region = region
-        self.keepGoing = {
-            let thisRange = $0.range
-            return range.lowerBound <= thisRange.lowerBound && thisRange.upperBound <= range.upperBound
-        }
-        self.start = Fixed<U>(region: region, instant: range.lowerBound)
-        self.stride = stride.dateComponents
+        self.algorithm = StridingAlgorithm(
+            region: region,
+            keepGoing: {
+                let thisRange = $0.range
+                return range.lowerBound <= thisRange.lowerBound && thisRange.upperBound <= range.upperBound
+            },
+            start: Fixed<U>(region: region, instant: range.lowerBound),
+            stride: stride.dateComponents
+        )
     }
     
     /// Construct an iterator of fixed values that are within a specific closed range
@@ -101,22 +105,49 @@ public struct FixedIterator<U: Unit & LTOEEra>: IteratorProtocol {
     ///   - range: The `ClosedRange` of ``Instant`` values to iterate through.
     ///   - stride: The difference between subsequent fixed values.
     public init(region: Region, range: ClosedRange<Instant>, stride: TimeDifference<U, Era>) {
-        self.region = region
-        self.keepGoing = { range.overlaps($0.range) }
-        self.start = Fixed<U>(region: region, instant: range.lowerBound)
-        self.stride = stride.dateComponents
+        self.algorithm = StridingAlgorithm(region: region,
+                                           keepGoing: { range.overlaps($0.range) },
+                                           start: Fixed<U>(region: region, instant: range.lowerBound),
+                                           stride: stride.dateComponents)
     }
     
     /// Produce the next fixed value
     /// - Returns: The next fixed value, or `nil` if there are no more values to produce.
     public mutating func next() -> Fixed<U>? {
+        return algorithm.next()
+    }
+}
+
+internal protocol IterationAlgorithm<U> {
+    associatedtype U: Unit & LTOEEra
+    
+    mutating func next() -> Fixed<U>?
+}
+
+internal struct EmptyAlgorithm<U: Unit & LTOEEra>: IterationAlgorithm {
+    func next() -> Fixed<U>? {
+        return nil
+    }
+}
+
+internal struct StridingAlgorithm<U: Unit & LTOEEra>: IterationAlgorithm {
+    
+    internal let region: Region
+    
+    internal let keepGoing: (Fixed<U>) -> Bool
+    internal let start: Fixed<U>
+    
+    internal var scale = 0
+    internal let stride: DateComponents
+    
+    internal mutating func next() -> Fixed<U>? {
         let next = stride.scale(by: scale)
         scale += 1
         
         let delta = TimeDifference<U, Era>(next)
         let n = start + delta
         guard keepGoing(n) else { return nil }
-        
         return n
     }
+    
 }

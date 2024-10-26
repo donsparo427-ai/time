@@ -2,13 +2,13 @@ import Foundation
 
 extension Fixed where Granularity: StandardUnit & GTOEMonth & LTOEYear {
     
-    public var firstWeek: Fixed<Week> { first() }
+    public var firstOverlappingWeek: Fixed<Week> { first() }
     
-    public var lastWeek: Fixed<Week> { .init(region: region, instant: lastDay.firstInstant) }
+    public var lastOverlappingWeek: Fixed<Week> { .init(region: region, instant: lastDay.firstInstant) }
     
     public var firstFullWeek: Fixed<Week>? {
         let thisRange = self.range
-        let firstWeek = self.firstWeek
+        let firstWeek = self.firstOverlappingWeek
         let firstWeekRelation = firstWeek.range.determineRelationship(to: thisRange)
         
         if firstWeekRelation == .starts || firstWeekRelation == .during || firstWeekRelation == .finishes {
@@ -29,7 +29,7 @@ extension Fixed where Granularity: StandardUnit & GTOEMonth & LTOEYear {
     
     public var lastFullWeek: Fixed<Week>? {
         let thisRange = self.range
-        let lastWeek = self.lastWeek
+        let lastWeek = self.lastOverlappingWeek
         let lastWeekRelation = lastWeek.range.determineRelationship(to: thisRange)
         
         if lastWeekRelation == .starts || lastWeekRelation == .during || lastWeekRelation == .finishes {
@@ -48,12 +48,12 @@ extension Fixed where Granularity: StandardUnit & GTOEMonth & LTOEYear {
         return nil
     }
     
-    /// Retrieve a specific 1-based week from this month
+    /// Retrieve a specific 1-based full week from this fixed value
     ///
     /// Example:
     /// ```
-    /// let firstWeek = try thisFixedMonth.nthWeek(1)
-    /// let secondWeek = try thisFixedMonth.nthWeek(2)
+    /// let firstWeek = try thisFixedMonth.nthFullWeek(1)
+    /// let secondWeek = try thisFixedMonth.nthFullWeek(2)
     /// ```
     ///
     /// - Parameter ordinal: The week number
@@ -61,13 +61,13 @@ extension Fixed where Granularity: StandardUnit & GTOEMonth & LTOEYear {
     /// - Throws: This method throws a ``TimeError`` if `ordinal` is outside the range of values allowed by the `.calendar`.
     ///
     /// - Note: The allowable values for `ordinal` depend on the fixed value's `.calendar`.
-    /// For example, getting the `.nthWeek(8)` of a `Fixed<Month>` will throw an error, because no supported calendar has a month
-    /// with more than about 5 weeks. However, getting the `.nthWeek(8)` of a `Fixed<Year>` is fine, because years typically have at least
+    /// For example, getting the `.nthFullWeek(8)` of a `Fixed<Month>` will throw an error, because no supported calendar has a month
+    /// with more than about 5 weeks. However, getting the `.nthFullWeek(8)` of a `Fixed<Year>` is fine, because years typically have at least
     /// 50 weeks in them.
     ///
     /// - Warning: The first day of the first week will likely *not* be the same as the first day of the month, and may not be in the month at all.
     /// Each ``Region`` has its own rules about how weeks are attributed to months.
-    public func nthWeek(_ ordinal: Int) throws -> Fixed<Week> {
+    public func nthFullWeek(_ ordinal: Int) throws -> Fixed<Week> {
         let unit = Granularity.self == Year.self ? Calendar.Component.weekOfYear : .weekOfMonth
         let dc = DateComponents(value: ordinal, component: unit)
         
@@ -75,25 +75,37 @@ extension Fixed where Granularity: StandardUnit & GTOEMonth & LTOEYear {
             throw TimeError.invalidDateComponents(dc, in: region, description: "Invalid ordinal of \(ordinal) weeks")
         }
         
-        let first = self.firstWeek
-        let target = first.adding(weeks: ordinal - 1)
-        let middleOfWeek = try target.nthDay(4)
-        guard middleOfWeek.truncated() == self else {
+        guard let first = self.firstFullWeek else {
+            throw TimeError.invalidDateComponents(dc, in: region, description: "\(self.description) does not contain a single full week")
+        }
+        
+        let targetWeek = first.adding(weeks: ordinal - 1)
+        let lastDayOfTargetWeek = targetWeek.lastDay
+        guard lastDayOfTargetWeek.truncated() == self else {
             throw TimeError.invalidDateComponents(dc, in: region, description: "Invalid ordinal of \(ordinal) weeks")
         }
-        return target
+        return targetWeek
     }
     
 }
 
 extension Fixed where Granularity: StandardUnit & GTOEMonth & LTOEYear {
     
-    public var weeks: FixedSequence<Week> {
-        return FixedSequence(start: self.firstWeek,
+    public var overlappingWeeks: FixedSequence<Week> {
+        return FixedSequence(start: self.firstOverlappingWeek,
                              stride: .weeks(1),
                              while: { week in
             week.days.contains(where: { $0.truncated() == self })
         })
+    }
+    
+    public var fullWeeks: FixedSequence<Week> {
+        // if this value does not contain a full week, return an empty sequence
+        guard let first = self.firstFullWeek else { return .init() }
+        
+        return FixedSequence(start: first,
+                             stride: .weeks(1),
+                             while: { self.contains($0) })
     }
     
 }

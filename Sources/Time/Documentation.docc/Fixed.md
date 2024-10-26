@@ -62,6 +62,8 @@ Properties related to specific times on a day
 
 - ``Fixed/years``
 - ``Fixed/months``
+- ``Fixed/overlappingWeeks``
+- ``Fixed/fullWeeks``
 - ``Fixed/days``
 - ``Fixed/hours``
 - ``Fixed/minutes``
@@ -71,12 +73,16 @@ Properties related to specific times on a day
 
 - ``Fixed/firstYear``
 - ``Fixed/firstMonth``
+- ``Fixed/firstOverlappingWeek``
+- ``Fixed/firstFullWeek``
 - ``Fixed/firstDay``
 - ``Fixed/firstHour``
 - ``Fixed/firstMinute``
 - ``Fixed/firstSecond``
 - ``Fixed/lastYear``
 - ``Fixed/lastMonth``
+- ``Fixed/lastOverlappingWeek``
+- ``Fixed/lastFullWeek``
 - ``Fixed/lastDay``
 - ``Fixed/lastHour``
 - ``Fixed/lastMinute``
@@ -89,6 +95,7 @@ Properties related to specific times on a day
 - ``Fixed/second(_:)``
 - ``Fixed/nthYear(_:)``
 - ``Fixed/nthMonth(_:)``
+- ``Fixed/nthFullWeek(_:)``
 - ``Fixed/nthDay(_:)``
 - ``Fixed/nthHour(_:)``
 - ``Fixed/nthMinute(_:)``
@@ -97,39 +104,43 @@ Properties related to specific times on a day
 ### Adjusting Values
 
 - ``Fixed/next``
+- ``Fixed/nextYear``
+- ``Fixed/nextMonth``
+- ``Fixed/nextWeek``
 - ``Fixed/nextDay``
 - ``Fixed/nextHour``
 - ``Fixed/nextMinute``
-- ``Fixed/nextMonth``
-- ``Fixed/nextNanosecond``
 - ``Fixed/nextSecond``
-- ``Fixed/nextYear``
+- ``Fixed/nextNanosecond``
 - ``Fixed/previous``
+- ``Fixed/previousYear``
+- ``Fixed/previousMonth``
+- ``Fixed/previousWeek``
 - ``Fixed/previousDay``
 - ``Fixed/previousHour``
 - ``Fixed/previousMinute``
-- ``Fixed/previousMonth``
-- ``Fixed/previousNanosecond``
 - ``Fixed/previousSecond``
-- ``Fixed/previousYear``
+- ``Fixed/previousNanosecond``
 - ``Fixed/next(dayOfWeek:)``
 - ``Fixed/next(weekday:)``
 - ``Fixed/offset(by:)``
 - ``Fixed/adding(years:)``
 - ``Fixed/adding(months:)``
+- ``Fixed/adding(weeks:)``
 - ``Fixed/adding(days:)``
 - ``Fixed/adding(hours:)``
 - ``Fixed/adding(minutes:)``
 - ``Fixed/adding(seconds:)``
 - ``Fixed/adding(nanoseconds:)``
-- ``Fixed/applying(difference:)``
+- ``Fixed/subtracting(years:)``
+- ``Fixed/subtracting(months:)``
+- ``Fixed/subtracting(weeks:)``
 - ``Fixed/subtracting(days:)``
 - ``Fixed/subtracting(hours:)``
 - ``Fixed/subtracting(minutes:)``
-- ``Fixed/subtracting(months:)``
-- ``Fixed/subtracting(nanoseconds:)``
 - ``Fixed/subtracting(seconds:)``
-- ``Fixed/subtracting(years:)``
+- ``Fixed/subtracting(nanoseconds:)``
+- ``Fixed/applying(difference:)``
 
 ### Truncating Values
 
@@ -138,6 +149,7 @@ Properties related to specific times on a day
 - ``Fixed/fixedHour``
 - ``Fixed/fixedMinute``
 - ``Fixed/fixedMonth``
+- ``Fixed/fixedWeek``
 - ``Fixed/fixedSecond``
 - ``Fixed/fixedYear``
 
@@ -145,14 +157,16 @@ Properties related to specific times on a day
 
 - ``Fixed/nearestDay``
 - ``Fixed/nearestEra``
+- ``Fixed/nearestYear``
+- ``Fixed/nearestMonth``
+- ``Fixed/nearestWeek``
 - ``Fixed/nearestHour``
 - ``Fixed/nearestMinute``
-- ``Fixed/nearestMonth``
 - ``Fixed/nearestSecond``
-- ``Fixed/nearestYear``
 - ``Fixed/roundedToNearestEra()``
 - ``Fixed/roundedToNearestYear()``
 - ``Fixed/roundedToNearestMonth()``
+- ``Fixed/roundedToNearestWeek()``
 - ``Fixed/roundedToNearestDay()``
 - ``Fixed/roundedToNearestHour()``
 - ``Fixed/roundedToNearestMinute()``
@@ -161,6 +175,7 @@ Properties related to specific times on a day
 - ``Fixed/roundedToEra(direction:)``
 - ``Fixed/roundedToYear(direction:)``
 - ``Fixed/roundedToMonth(direction:)``
+- ``Fixed/roundedToWeek(direction:)``
 - ``Fixed/roundedToDay(direction:)``
 - ``Fixed/roundedToHour(direction:)``
 - ``Fixed/roundedToMinute(direction:)``

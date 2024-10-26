@@ -18,10 +18,13 @@ Planned and proposed features for **Time**.
     - Rounding
 - Formatting `TimeDifference` values
 - Formatting `Range<Fixed<U>>` values
-- Pseudo-units (weeks and quarters)
-    - Weeks: [#68](https://github.com/davedelong/time/issues/68)
-    - Probably not done as a new `Unit`, since it would interfere with the GTOE/LTOE protocols
+- Pseudo-units
+    - Quarters
 - Parsing fixed values
+
+## Medium-term Features
+
+- An entire "TimeUI" library
 
 ## Long-term Features
 
@@ -39,6 +42,8 @@ Planned and proposed features for **Time**.
 
 ## Other possible features
 
+- Cyclical years?
+    - Ex: Chinese lunar year names (Tiger, Boar, Snake, etc)
 - Lenient parsing 
     - Ex: provide "January 31st", without any format information, and have it figure it out
 - Celestial event calculations?

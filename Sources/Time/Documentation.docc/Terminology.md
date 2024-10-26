@@ -14,7 +14,7 @@
     In **Time**, a fixed value has *granularity*, which is the degree of specificity of the value. A `Fixed<Month>` only contains information about the era, year, and month. A `Fixed<Minute>` contains information about the era, year, month, hour, and minute.
 - term Floating: A "floating" value can refer to many potential values on a calendar. While "February 2024" is a `Fixed<Month>`, "February" itself is a *floating* value and can refer to any number of potential February values from different years.
 - term Formatting: The process of transforming a value into a human-readable form, typically a `String`.
+- term Full: A "full week" is a week that is entirely contained within the parent value. For example, the first "full week" of January 2024 was the week of January 7th (assuming a region where weeks start on Sunday). The last "full week" of 2024 is the week of December 22nd.
+- term Overlapping: An "overlapping" week is one that is some-or-entirely contained within the parent value. For example, the first "overlapping week" of January 2024 was the week starting on December 31, 2023. This also implies that the last "overlapping week" of 2023 was the same week.
 - term Parsing: The process of transforming a human-readable `String` into a value.
 - term Region: A region in the **Time** package is the combination of a specific calendar, locale, and time zone.
-
-

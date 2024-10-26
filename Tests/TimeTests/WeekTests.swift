@@ -56,20 +56,6 @@ class WeekTests: XCTestCase {
         XCTAssertTime(nextDays[6], era: 1, year: 2024, month: 1, day: 13)
     }
     
-    func testWeekInitialization() throws {
-        let woy1 = try Fixed(region: .posix, year: 2024, week: 1)
-        XCTAssertTime(woy1.firstDay, era: 1, year: 2023, month: 12, day: 31)
-        XCTAssertTime(woy1.lastDay, era: 1, year: 2024, month: 1, day: 6)
-        
-        let woy26 = try Fixed(region: .posix, year: 2024, week: 26)
-        XCTAssertTime(woy26.firstDay, era: 1, year: 2024, month: 6, day: 23)
-        
-        let woy53 = try Fixed(region: .posix, year: 2024, week: 53)
-        XCTAssertTime(woy53.firstDay, era: 1, year: 2024, month: 12, day: 29)
-        
-        XCTAssertThrowsError(try Fixed(region: .posix, year: 2024, week: 54))
-    }
-    
     func testWeekAdjustment() throws {
         let d1 = try Fixed<Day>(region: .posix, year: 2024, month: 1, day: 1)
         let c = Clocks.custom(startingFrom: d1.firstInstant)

@@ -1,19 +1,5 @@
 import Foundation
 
-extension Fixed where Granularity: LTMonth {
-    
-    public var weekOfMonth: Int {
-        #warning("TODO: verify")
-        return calendar.component(.weekOfMonth, from: self.approximateMidPoint.date)
-    }
-    
-    public var weekOfYear: Int {
-        #warning("TODO: verify")
-        return calendar.component(.weekOfYear, from: self.approximateMidPoint.date)
-    }
-    
-}
-
 extension Fixed where Granularity: StandardUnit & GTOEMonth & LTOEYear {
     
     public var firstWeek: Fixed<Week> { first() }

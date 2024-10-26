@@ -42,7 +42,7 @@ struct DayPicker<Label: View>: View {
     }
     
     private var weeksForCurrentMonth: Array<Fixed<Week>> {
-        var weeks = Array(currentMonth.weeks)
+        var weeks = Array(currentMonth.overlappingWeeks)
         
         if consistentNumberOfWeeks {
             // Apple Calendar shows 6 weeks at a time, so all views have the same vertical height
